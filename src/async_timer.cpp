@@ -16,7 +16,7 @@ namespace lmshao::lmcore {
 
 AsyncTimer::AsyncTimer(int threadPoolSize)
 {
-    threadPool_ = std::make_unique<ThreadPool>(1, threadPoolSize, "AsyncTimer");
+    threadPool_ = std::make_unique<ThreadPool>(threadPoolSize, threadPoolSize, "AsyncTimer");
 }
 
 AsyncTimer::~AsyncTimer()
