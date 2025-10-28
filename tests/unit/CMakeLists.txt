@@ -29,3 +29,9 @@ add_executable(test_object_pool test_object_pool.cpp)
 target_link_libraries(test_object_pool lmcore ${PLATFORM_LIBS})
 add_test(NAME ObjectPoolTests COMMAND $<TARGET_FILE:test_object_pool>)
 set_tests_properties(ObjectPoolTests PROPERTIES LABELS "unit")
+
+# ByteOrder unit tests
+add_executable(test_byte_order test_byte_order.cpp)
+target_link_libraries(test_byte_order lmcore)
+add_test(NAME ByteOrderTests COMMAND $<TARGET_FILE:test_byte_order>)
+set_tests_properties(ByteOrderTests PROPERTIES LABELS "unit")
