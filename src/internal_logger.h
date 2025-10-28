@@ -29,48 +29,48 @@ inline Logger &GetLmCoreLoggerWithAutoInit()
 }
 
 // Internal LmCore logging macros with auto-initialization and module tagging
-#define LMCORE_LOGD(fmt, ...)                                                                                       \
+#define LMCORE_LOGD(fmt, ...)                                                                                          \
     do {                                                                                                               \
-        auto &logger = lmshao::lmcore::GetLmCoreLoggerWithAutoInit();                                            \
-        if (logger.ShouldLog(lmshao::lmcore::LogLevel::kDebug)) {                                                   \
-            logger.LogWithModuleTag<lmshao::lmcore::LmCoreModuleTag>(                                            \
-                lmshao::lmcore::LogLevel::kDebug, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__);            \
+        auto &logger = lmshao::lmcore::GetLmCoreLoggerWithAutoInit();                                                  \
+        if (logger.ShouldLog(lmshao::lmcore::LogLevel::kDebug)) {                                                      \
+            logger.LogWithModuleTag<lmshao::lmcore::LmCoreModuleTag>(lmshao::lmcore::LogLevel::kDebug, __FILE__,       \
+                                                                     __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__);      \
         }                                                                                                              \
     } while (0)
 
-#define LMCORE_LOGI(fmt, ...)                                                                                       \
+#define LMCORE_LOGI(fmt, ...)                                                                                          \
     do {                                                                                                               \
-        auto &logger = lmshao::lmcore::GetLmCoreLoggerWithAutoInit();                                            \
-        if (logger.ShouldLog(lmshao::lmcore::LogLevel::kInfo)) {                                                    \
-            logger.LogWithModuleTag<lmshao::lmcore::LmCoreModuleTag>(                                            \
-                lmshao::lmcore::LogLevel::kInfo, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__);             \
+        auto &logger = lmshao::lmcore::GetLmCoreLoggerWithAutoInit();                                                  \
+        if (logger.ShouldLog(lmshao::lmcore::LogLevel::kInfo)) {                                                       \
+            logger.LogWithModuleTag<lmshao::lmcore::LmCoreModuleTag>(lmshao::lmcore::LogLevel::kInfo, __FILE__,        \
+                                                                     __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__);      \
         }                                                                                                              \
     } while (0)
 
-#define LMCORE_LOGW(fmt, ...)                                                                                       \
+#define LMCORE_LOGW(fmt, ...)                                                                                          \
     do {                                                                                                               \
-        auto &logger = lmshao::lmcore::GetLmCoreLoggerWithAutoInit();                                            \
-        if (logger.ShouldLog(lmshao::lmcore::LogLevel::kWarn)) {                                                    \
-            logger.LogWithModuleTag<lmshao::lmcore::LmCoreModuleTag>(                                            \
-                lmshao::lmcore::LogLevel::kWarn, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__);             \
+        auto &logger = lmshao::lmcore::GetLmCoreLoggerWithAutoInit();                                                  \
+        if (logger.ShouldLog(lmshao::lmcore::LogLevel::kWarn)) {                                                       \
+            logger.LogWithModuleTag<lmshao::lmcore::LmCoreModuleTag>(lmshao::lmcore::LogLevel::kWarn, __FILE__,        \
+                                                                     __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__);      \
         }                                                                                                              \
     } while (0)
 
-#define LMCORE_LOGE(fmt, ...)                                                                                       \
+#define LMCORE_LOGE(fmt, ...)                                                                                          \
     do {                                                                                                               \
-        auto &logger = lmshao::lmcore::GetLmCoreLoggerWithAutoInit();                                            \
-        if (logger.ShouldLog(lmshao::lmcore::LogLevel::kError)) {                                                   \
-            logger.LogWithModuleTag<lmshao::lmcore::LmCoreModuleTag>(                                            \
-                lmshao::lmcore::LogLevel::kError, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__);            \
+        auto &logger = lmshao::lmcore::GetLmCoreLoggerWithAutoInit();                                                  \
+        if (logger.ShouldLog(lmshao::lmcore::LogLevel::kError)) {                                                      \
+            logger.LogWithModuleTag<lmshao::lmcore::LmCoreModuleTag>(lmshao::lmcore::LogLevel::kError, __FILE__,       \
+                                                                     __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__);      \
         }                                                                                                              \
     } while (0)
 
-#define LMCORE_LOGF(fmt, ...)                                                                                       \
+#define LMCORE_LOGF(fmt, ...)                                                                                          \
     do {                                                                                                               \
-        auto &logger = lmshao::lmcore::GetLmCoreLoggerWithAutoInit();                                            \
-        if (logger.ShouldLog(lmshao::lmcore::LogLevel::kFatal)) {                                                   \
-            logger.LogWithModuleTag<lmshao::lmcore::LmCoreModuleTag>(                                            \
-                lmshao::lmcore::LogLevel::kFatal, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__);            \
+        auto &logger = lmshao::lmcore::GetLmCoreLoggerWithAutoInit();                                                  \
+        if (logger.ShouldLog(lmshao::lmcore::LogLevel::kFatal)) {                                                      \
+            logger.LogWithModuleTag<lmshao::lmcore::LmCoreModuleTag>(lmshao::lmcore::LogLevel::kFatal, __FILE__,       \
+                                                                     __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__);      \
         }                                                                                                              \
     } while (0)
 

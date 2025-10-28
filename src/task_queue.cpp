@@ -80,8 +80,8 @@ int32_t TaskQueue::EnqueueTask(const std::shared_ptr<ITaskHandler> &task, bool c
 
     if (delayUs >= MAX_DELAY_US) {
         LMCORE_LOGE("Enqueue task when taskqueue delayUs[%llu] is >= max delayUs %llu invalid! [%s]",
-                       static_cast<unsigned long long>(delayUs), static_cast<unsigned long long>(MAX_DELAY_US),
-                       name_.c_str());
+                    static_cast<unsigned long long>(delayUs), static_cast<unsigned long long>(MAX_DELAY_US),
+                    name_.c_str());
         return -1;
     }
 
