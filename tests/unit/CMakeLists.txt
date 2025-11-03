@@ -35,3 +35,27 @@ add_executable(test_byte_order test_byte_order.cpp)
 target_link_libraries(test_byte_order lmcore)
 add_test(NAME ByteOrderTests COMMAND $<TARGET_FILE:test_byte_order>)
 set_tests_properties(ByteOrderTests PROPERTIES LABELS "unit")
+
+# MappedFile unit tests
+add_executable(test_mapped_file test_mapped_file.cpp)
+target_link_libraries(test_mapped_file lmcore)
+add_test(NAME MappedFileTests COMMAND $<TARGET_FILE:test_mapped_file>)
+set_tests_properties(MappedFileTests PROPERTIES LABELS "unit")
+
+# Base64 unit tests
+add_executable(test_base64 test_base64.cpp)
+target_link_libraries(test_base64 lmcore)
+add_test(NAME Base64Tests COMMAND $<TARGET_FILE:test_base64>)
+set_tests_properties(Base64Tests PROPERTIES LABELS "unit")
+
+# CRC32 unit tests
+add_executable(test_crc32 test_crc32.cpp)
+target_link_libraries(test_crc32 lmcore)
+add_test(NAME CRC32Tests COMMAND $<TARGET_FILE:test_crc32>)
+set_tests_properties(CRC32Tests PROPERTIES LABELS "unit")
+
+# MD5 unit tests
+add_executable(test_md5 test_md5.cpp)
+target_link_libraries(test_md5 lmcore)
+add_test(NAME MD5Tests COMMAND $<TARGET_FILE:test_md5>)
+set_tests_properties(MD5Tests PROPERTIES LABELS "unit")
