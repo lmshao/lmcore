@@ -59,3 +59,9 @@ add_executable(test_md5 test_md5.cpp)
 target_link_libraries(test_md5 lmcore)
 add_test(NAME MD5Tests COMMAND $<TARGET_FILE:test_md5>)
 set_tests_properties(MD5Tests PROPERTIES LABELS "unit")
+
+# URL unit tests
+add_executable(test_url test_url.cpp)
+target_link_libraries(test_url lmcore)
+add_test(NAME URLTests COMMAND $<TARGET_FILE:test_url>)
+set_tests_properties(URLTests PROPERTIES LABELS "unit")
