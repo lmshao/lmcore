@@ -65,3 +65,27 @@ add_executable(test_url test_url.cpp)
 target_link_libraries(test_url lmcore)
 add_test(NAME URLTests COMMAND $<TARGET_FILE:test_url>)
 set_tests_properties(URLTests PROPERTIES LABELS "unit")
+
+# Hex unit tests
+add_executable(test_hex test_hex.cpp)
+target_link_libraries(test_hex lmcore)
+add_test(NAME HexTests COMMAND $<TARGET_FILE:test_hex>)
+set_tests_properties(HexTests PROPERTIES LABELS "unit")
+
+# StringUtils unit tests
+add_executable(test_string_utils test_string_utils.cpp)
+target_link_libraries(test_string_utils lmcore)
+add_test(NAME StringUtilsTests COMMAND $<TARGET_FILE:test_string_utils>)
+set_tests_properties(StringUtilsTests PROPERTIES LABELS "unit")
+
+# TimeUtils unit tests
+add_executable(test_time_utils test_time_utils.cpp)
+target_link_libraries(test_time_utils lmcore)
+add_test(NAME TimeUtilsTests COMMAND $<TARGET_FILE:test_time_utils>)
+set_tests_properties(TimeUtilsTests PROPERTIES LABELS "unit")
+
+# UUID unit tests
+add_executable(test_uuid test_uuid.cpp)
+target_link_libraries(test_uuid lmcore)
+add_test(NAME UUIDTests COMMAND $<TARGET_FILE:test_uuid>)
+set_tests_properties(UUIDTests PROPERTIES LABELS "unit")
