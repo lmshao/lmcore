@@ -49,7 +49,7 @@ TEST(Base64, EncodeBinaryData)
 {
     uint8_t data[] = {0x00, 0x01, 0x02, 0x03, 0xFF, 0xFE, 0xFD};
     std::string result = Base64::Encode(data, sizeof(data));
-    EXPECT_EQ("AAECA//+/Q==", result); // 修正期望值
+    EXPECT_EQ("AAECA//+/Q==", result); // Adjust expected value
 }
 
 TEST(Base64, DecodeEmptyString)
@@ -87,7 +87,7 @@ TEST(Base64, DecodeLongString)
 
 TEST(Base64, DecodeBinaryData)
 {
-    std::string encoded = "AAECA//+/Q=="; // 修正输入
+    std::string encoded = "AAECA//+/Q=="; // Adjust input
     auto result = Base64::Decode(encoded);
     EXPECT_EQ(7, result.size());
     EXPECT_EQ(0x00, result[0]);

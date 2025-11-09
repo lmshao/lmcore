@@ -55,7 +55,8 @@ TEST(StringUtils, SplitSkipEmpty)
 TEST(StringUtils, SplitEmptyString)
 {
     auto parts = StringUtils::Split("", ',');
-    // 空字符串分割后应该没有元素（getline 不会提取任何内容）
+    // Splitting an empty string should produce no elements
+    // getline will not extract any content from an empty input
     EXPECT_EQ(0, parts.size());
 }
 
@@ -187,8 +188,8 @@ TEST(StringUtils, ReplaceAll)
 {
     EXPECT_EQ("baz bar baz", StringUtils::ReplaceAll("foo bar foo", "foo", "baz"));
     EXPECT_EQ("hello world", StringUtils::ReplaceAll("hello world", "xyz", "abc"));
-    EXPECT_EQ("aaab2c3", StringUtils::ReplaceAll("a1b2c3", "1", "aa")); // 只替换 "1"
-    EXPECT_EQ("aaab2c", StringUtils::ReplaceAll("a1b2c", "1", "aa"));   // 修正预期值
+    EXPECT_EQ("aaab2c3", StringUtils::ReplaceAll("a1b2c3", "1", "aa")); // Replace only '1'
+    EXPECT_EQ("aaab2c", StringUtils::ReplaceAll("a1b2c", "1", "aa"));   // Fix expected value
 }
 
 // Replace with empty
