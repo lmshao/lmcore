@@ -168,15 +168,15 @@ TEST(Hex, DecodeOddLength)
     EXPECT_EQ(0, result.size());
 }
 
-// Decode invalid characters (现在实现会忽略非十六进制字符，所以这个测试需要调整)
+// Decode invalid characters (implementation currently ignores non-hex characters)
 TEST(Hex, DecodeInvalidChars)
 {
-    // 当前实现忽略非十六进制字符，提取出有效的十六进制字符
+    // The current implementation ignores non-hex characters and extracts valid hex digits
     std::vector<uint8_t> result;
     bool success = Hex::Decode("GGHHII", result);
-    // "GGHHII" 中没有有效的十六进制对，所以应该返回 false (奇数个十六进制字符)
-    // 实际上 "II" 是无效的，会被忽略
-    EXPECT_TRUE(success); // 实现会返回 true 但 result 为空
+    // "GGHHII" contains no valid hex pairs; after filtering, length is odd
+    // In practice, invalid digits like "II" are ignored by the implementation
+    EXPECT_TRUE(success); // Implementation returns true but result is empty
     EXPECT_EQ(0, result.size());
 }
 

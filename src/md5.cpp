@@ -194,14 +194,20 @@ void MD5::Transform(uint32_t state[4], const uint8_t block[64])
 
 void MD5::Update(Context &ctx, const uint8_t *data, size_t len)
 {
-    uint32_t i, index, partLen;
+    // Use size_t for loop index to match input length type
+    size_t i;
+    uint32_t index, partLen;
 
     index = (ctx.count[0] >> 3) & 0x3F;
 
-    if ((ctx.count[0] += (len << 3)) < (len << 3)) {
+    // Explicitly narrow bit length to 32-bit words to avoid C4267 warnings
+    const uint32_t bitlen_low = static_cast<uint32_t>(len << 3);
+    const uint32_t bitlen_high = static_cast<uint32_t>(len >> 29);
+
+    if ((ctx.count[0] += bitlen_low) < bitlen_low) {
         ctx.count[1]++;
     }
-    ctx.count[1] += (len >> 29);
+    ctx.count[1] += bitlen_high;
 
     partLen = 64 - index;
 
