@@ -77,9 +77,9 @@ int64_t TimeUtils::NtpToUnix(uint64_t ntp_timestamp)
 
 uint32_t TimeUtils::GetRtpTimestamp(uint32_t clock_rate)
 {
-    // RTP timestamp is based on microseconds since some arbitrary epoch
-    // For simplicity, use current time in microseconds
-    int64_t us = GetCurrentTimeUs();
+    // Use steady_clock to avoid jumps due to system time adjustments
+    auto now = std::chrono::steady_clock::now();
+    auto us = std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
 
     // Convert to RTP clock units
     // RTP_timestamp = (us / 1000000) * clock_rate
@@ -212,7 +212,30 @@ void TimeUtils::SleepMs(int64_t ms)
 
 void TimeUtils::SleepUs(int64_t us)
 {
-    std::this_thread::sleep_for(std::chrono::microseconds(us));
+    // Use pure busy-wait for short sleeps to achieve microsecond-level precision
+    // This avoids kernel scheduling jitter on Windows for sub-20ms sleeps.
+    if (us <= 0) {
+        return;
+    }
+
+    using namespace std::chrono;
+
+    if (us <= 20000) {
+        auto start = steady_clock::now();
+        auto target = start + microseconds(us);
+        while (steady_clock::now() < target) {
+            // Tight spin for precise timing
+        }
+        return;
+    }
+
+    // For longer durations, sleep most of the time, then spin the last 1ms
+    auto coarse = us - 1000;
+    std::this_thread::sleep_for(microseconds(coarse));
+    auto start = steady_clock::now();
+    while (duration_cast<microseconds>(steady_clock::now() - start).count() < 1000) {
+        // Tight spin for final adjustment
+    }
 }
 
 } // namespace lmshao::lmcore
