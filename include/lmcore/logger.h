@@ -153,7 +153,10 @@ public:
         }
     }
 
-    bool ShouldLog(LogLevel level) const { return level >= level_; }
+    bool ShouldLog(LogLevel level) const
+    {
+        return level >= level_;
+    }
 
 private:
     std::string GetTimeString() const;

@@ -128,7 +128,10 @@ public:
      * @param buffer Buffer to read from
      * @return Host byte order value
      */
-    static uint16_t ReadBE16(const uint8_t *buffer) { return (static_cast<uint16_t>(buffer[0]) << 8) | buffer[1]; }
+    static uint16_t ReadBE16(const uint8_t *buffer)
+    {
+        return (static_cast<uint16_t>(buffer[0]) << 8) | buffer[1];
+    }
 
     /**
      * @brief Read 32-bit big-endian value from buffer
@@ -222,7 +225,10 @@ public:
      * @param value Value to swap
      * @return Byte-swapped value
      */
-    static uint16_t Swap16(uint16_t value) { return ((value & 0xFF) << 8) | ((value >> 8) & 0xFF); }
+    static uint16_t Swap16(uint16_t value)
+    {
+        return ((value & 0xFF) << 8) | ((value >> 8) & 0xFF);
+    }
 
     /**
      * @brief Swap bytes of 32-bit value
