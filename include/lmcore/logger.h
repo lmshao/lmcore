@@ -176,14 +176,14 @@ private:
 template <typename ModuleTag>
 Logger &LoggerRegistry::GetLogger()
 {
-    static std::once_flag flag;
-    static Logger *logger = nullptr;
-
-    std::call_once(flag, []() {
+    // Use thread_local cache for performance while allowing dynamic level changes
+    thread_local Logger *logger = nullptr;
+    
+    if (!logger) {
         std::string module_name = GetModuleName<ModuleTag>();
         logger = &GetOrCreateLogger(std::type_index(typeid(ModuleTag)), module_name);
-    });
-
+    }
+    
     return *logger;
 }
 

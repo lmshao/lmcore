@@ -15,15 +15,12 @@ namespace lmshao::lmcore {
 
 /**
  * @brief Get LmCore logger with automatic initialization
- * This version ensures the logger is properly initialized before use.
- * Used internally by LmCore modules.
  */
 inline Logger &GetLmCoreLoggerWithAutoInit()
 {
     static std::once_flag initFlag;
     std::call_once(initFlag, []() {
         LoggerRegistry::RegisterModule<LmCoreModuleTag>("LmCore");
-        InitLmCoreLogger();
     });
     return LoggerRegistry::GetLogger<LmCoreModuleTag>();
 }
