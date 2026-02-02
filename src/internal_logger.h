@@ -19,9 +19,7 @@ namespace lmshao::lmcore {
 inline Logger &GetLmCoreLoggerWithAutoInit()
 {
     static std::once_flag initFlag;
-    std::call_once(initFlag, []() {
-        LoggerRegistry::RegisterModule<LmCoreModuleTag>("LmCore");
-    });
+    std::call_once(initFlag, []() { LoggerRegistry::RegisterModule<LmCoreModuleTag>("LmCore"); });
     return LoggerRegistry::GetLogger<LmCoreModuleTag>();
 }
 

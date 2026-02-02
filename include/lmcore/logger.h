@@ -99,7 +99,10 @@ public:
     void SetOutputFile(const std::string &filename) { log_file_ = filename; }
     void SetLevel(LogLevel level) { level_ = level; }
     void SetModuleName(const std::string &module) { module_name_ = module; }
+
     LogLevel GetLevel() const { return level_; }
+    LogOutput GetOutput() const { return output_; }
+    std::string GetLogFile() const { return log_file_; }
     std::string GetModuleName() const { return module_name_; }
 
     void Log(LogLevel level, const char *file, int line, const char *func, const char *fmt, ...);
@@ -153,10 +156,7 @@ public:
         }
     }
 
-    bool ShouldLog(LogLevel level) const
-    {
-        return level >= level_;
-    }
+    bool ShouldLog(LogLevel level) const { return level >= level_; }
 
 private:
     std::string GetTimeString() const;
@@ -178,12 +178,12 @@ Logger &LoggerRegistry::GetLogger()
 {
     // Use thread_local cache for performance while allowing dynamic level changes
     thread_local Logger *logger = nullptr;
-    
+
     if (!logger) {
         std::string module_name = GetModuleName<ModuleTag>();
         logger = &GetOrCreateLogger(std::type_index(typeid(ModuleTag)), module_name);
     }
-    
+
     return *logger;
 }
 
