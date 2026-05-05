@@ -46,7 +46,7 @@ TEST(MpmcChannel, MultipleProducersConsumers)
     std::vector<std::thread> producers;
     for (size_t i = 0; i < num_producers; ++i) {
         auto tx_clone = tx;
-        producers.emplace_back([tx = tx_clone, i]() mutable {
+        producers.emplace_back([tx = tx_clone, i, items_per_producer]() mutable {
             for (size_t j = 0; j < items_per_producer; ++j) {
                 tx->Send(i * 1000 + j);
             }
@@ -116,14 +116,14 @@ TEST(MpmcChannel, Stress)
     auto rx1 = rx;
     auto rx2 = rx;
 
-    std::thread p1([tx = tx1, &sent]() mutable {
+    std::thread p1([tx = tx1, &sent, total_items]() mutable {
         for (size_t i = 0; i < total_items / 2; ++i) {
             tx->Send(i);
             sent.fetch_add(1);
         }
     });
 
-    std::thread p2([tx = tx2, &sent]() mutable {
+    std::thread p2([tx = tx2, &sent, total_items]() mutable {
         for (size_t i = total_items / 2; i < total_items; ++i) {
             tx->Send(i);
             sent.fetch_add(1);

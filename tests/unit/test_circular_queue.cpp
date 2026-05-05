@@ -206,13 +206,13 @@ TEST(CircularQueue, ProducerConsumer)
 
     std::atomic<size_t> sum{0};
 
-    std::thread producer([&queue]() {
+    std::thread producer([&queue, total_items]() {
         for (size_t i = 1; i <= total_items; ++i) {
             queue.Push(i);
         }
     });
 
-    std::thread consumer([&queue, &sum]() {
+    std::thread consumer([&queue, &sum, total_items]() {
         for (size_t i = 0; i < total_items; ++i) {
             size_t val = queue.Pop();
             sum.fetch_add(val, std::memory_order_relaxed);
@@ -237,7 +237,7 @@ TEST(CircularQueue, MultipleProducersSingleConsumer)
 
     std::vector<std::thread> producers;
     for (size_t i = 0; i < num_producers; ++i) {
-        producers.emplace_back([&queue, i]() {
+        producers.emplace_back([&queue, i, items_per_producer]() {
             for (size_t j = 0; j < items_per_producer; ++j) {
                 queue.Push(static_cast<int>(i * 1000 + j));
             }
@@ -270,7 +270,7 @@ TEST(CircularQueue, SingleProducerMultipleConsumers)
     std::atomic<size_t> received{0};
     std::atomic<size_t> sum{0};
 
-    std::thread producer([&queue]() {
+    std::thread producer([&queue, total_items]() {
         for (int i = 1; i <= static_cast<int>(total_items); ++i) {
             queue.Push(i);
         }

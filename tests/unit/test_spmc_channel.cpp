@@ -58,7 +58,7 @@ TEST(SpmcChannel, MultipleConsumers)
     }
 
     // Producer sends items
-    std::thread producer([tx = std::move(tx)]() mutable {
+    std::thread producer([tx = std::move(tx), total_items]() mutable {
         for (size_t i = 0; i < total_items; ++i) {
             tx->Send(i);
         }
@@ -100,7 +100,7 @@ TEST(SpmcChannel, ConcurrentSendRecv)
     auto rx1 = rx;
     auto rx2 = rx;
 
-    std::thread producer([tx = std::move(tx)]() mutable {
+    std::thread producer([tx = std::move(tx), total_items]() mutable {
         for (size_t i = 0; i < total_items; ++i) {
             tx->Send(i);
         }

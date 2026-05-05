@@ -176,7 +176,7 @@ TEST(SpscChannel, ProducerConsumer)
     std::atomic<size_t> sum{0};
 
     // Producer
-    std::thread producer([sender = std::move(sender)]() mutable {
+    std::thread producer([sender = std::move(sender), total_items]() mutable {
         for (size_t i = 1; i <= total_items; ++i) {
             while (!sender->TrySend(i)) {
                 std::this_thread::yield();

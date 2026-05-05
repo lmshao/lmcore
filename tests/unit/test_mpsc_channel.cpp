@@ -45,7 +45,7 @@ TEST(MpscChannel, MultipleProducers)
     std::vector<std::thread> producers;
     for (size_t i = 0; i < num_producers; ++i) {
         auto tx_clone = tx;
-        producers.emplace_back([tx = tx_clone, i]() mutable {
+        producers.emplace_back([tx = tx_clone, i, items_per_producer]() mutable {
             for (size_t j = 0; j < items_per_producer; ++j) {
                 while (!tx->TrySend(i * 1000 + j)) {
                     std::this_thread::yield();
@@ -100,13 +100,13 @@ TEST(MpscChannel, ConcurrentSendRecv)
     auto tx1 = tx;
     auto tx2 = tx;
 
-    std::thread producer1([tx = tx1]() mutable {
+    std::thread producer1([tx = tx1, total_items]() mutable {
         for (size_t i = 0; i < total_items / 2; ++i) {
             tx->Send(i);
         }
     });
 
-    std::thread producer2([tx = tx2]() mutable {
+    std::thread producer2([tx = tx2, total_items]() mutable {
         for (size_t i = total_items / 2; i < total_items; ++i) {
             tx->Send(i);
         }

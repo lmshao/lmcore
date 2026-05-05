@@ -12,8 +12,11 @@
 #include <atomic>
 #include <cstdint>
 #include <memory>
+#include <new>
 #include <optional>
 #include <thread>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 #include "noncopyable.h"
@@ -48,17 +51,32 @@ std::pair<std::shared_ptr<MpscSender<T>>, std::unique_ptr<MpscReceiver<T>>> Mpsc
 template <typename T>
 class MpscCircularQueue : public NonCopyable {
 public:
+    struct Slot {
+        std::atomic<uint64_t> sequence;
+        std::aligned_storage_t<sizeof(T), alignof(T)> storage;
+
+        Slot() : sequence(0) {}
+
+        T *Data() { return std::launder(reinterpret_cast<T *>(&storage)); }
+        const T *Data() const { return std::launder(reinterpret_cast<const T *>(&storage)); }
+    };
+
     explicit MpscCircularQueue(size_t capacity)
-        : capacity_(capacity == 0 ? 1 : capacity), buffer_(capacity_), head_(0), tail_(0)
+        : capacity_(capacity == 0 ? 1 : capacity), buffer_(capacity_), dequeuePos_(0), enqueuePos_(0)
     {
+        for (size_t index = 0; index < capacity_; ++index) {
+            buffer_[index].sequence.store(index, std::memory_order_relaxed);
+        }
     }
+
+    ~MpscCircularQueue() { Clear(); }
 
     size_t Capacity() const { return capacity_; }
 
     size_t Size() const
     {
-        const uint64_t h = head_.load(std::memory_order_relaxed);
-        const uint64_t t = tail_.load(std::memory_order_acquire);
+        const uint64_t h = dequeuePos_.load(std::memory_order_acquire);
+        const uint64_t t = enqueuePos_.load(std::memory_order_acquire);
 
         uint64_t diff = (t >= h) ? (t - h) : 0;
         uint64_t capacity_u64 = static_cast<uint64_t>(capacity_);
@@ -71,102 +89,99 @@ public:
 
     bool Empty() const
     {
-        uint64_t h = head_.load(std::memory_order_relaxed);
-        uint64_t t = tail_.load(std::memory_order_acquire);
+        uint64_t h = dequeuePos_.load(std::memory_order_acquire);
+        uint64_t t = enqueuePos_.load(std::memory_order_acquire);
         return t == h;
     }
 
     bool Full() const
     {
-        uint64_t h = head_.load(std::memory_order_acquire);
-        uint64_t t = tail_.load(std::memory_order_relaxed);
+        uint64_t h = dequeuePos_.load(std::memory_order_acquire);
+        uint64_t t = enqueuePos_.load(std::memory_order_acquire);
         return (t - h) >= static_cast<uint64_t>(capacity_);
     }
 
     bool TryPush(const T &value)
     {
+        uint64_t pos = enqueuePos_.load(std::memory_order_relaxed);
+
         while (true) {
-            uint64_t t = tail_.load(std::memory_order_relaxed);
-            uint64_t h = head_.load(std::memory_order_acquire);
+            Slot &slot = buffer_[static_cast<size_t>(pos % static_cast<uint64_t>(capacity_))];
+            uint64_t sequence = slot.sequence.load(std::memory_order_acquire);
+            intptr_t diff = static_cast<intptr_t>(sequence) - static_cast<intptr_t>(pos);
 
-            if ((t - h) >= static_cast<uint64_t>(capacity_)) {
+            if (diff == 0) {
+                if (enqueuePos_.compare_exchange_weak(pos, pos + 1, std::memory_order_acq_rel,
+                                                      std::memory_order_relaxed)) {
+                    new (&slot.storage) T(value);
+                    slot.sequence.store(pos + 1, std::memory_order_release);
+                    return true;
+                }
+            } else if (diff < 0) {
                 return false;
-            }
-
-            if (tail_.compare_exchange_weak(t, t + 1, std::memory_order_acq_rel, std::memory_order_relaxed)) {
-                buffer_[static_cast<size_t>(t % static_cast<uint64_t>(capacity_))].emplace(value);
-                return true;
+            } else {
+                pos = enqueuePos_.load(std::memory_order_relaxed);
             }
         }
     }
 
     bool TryPush(T &&value)
     {
+        uint64_t pos = enqueuePos_.load(std::memory_order_relaxed);
+
         while (true) {
-            uint64_t t = tail_.load(std::memory_order_relaxed);
-            uint64_t h = head_.load(std::memory_order_acquire);
+            Slot &slot = buffer_[static_cast<size_t>(pos % static_cast<uint64_t>(capacity_))];
+            uint64_t sequence = slot.sequence.load(std::memory_order_acquire);
+            intptr_t diff = static_cast<intptr_t>(sequence) - static_cast<intptr_t>(pos);
 
-            if ((t - h) >= static_cast<uint64_t>(capacity_)) {
+            if (diff == 0) {
+                if (enqueuePos_.compare_exchange_weak(pos, pos + 1, std::memory_order_acq_rel,
+                                                      std::memory_order_relaxed)) {
+                    new (&slot.storage) T(std::move(value));
+                    slot.sequence.store(pos + 1, std::memory_order_release);
+                    return true;
+                }
+            } else if (diff < 0) {
                 return false;
-            }
-
-            if (tail_.compare_exchange_weak(t, t + 1, std::memory_order_acq_rel, std::memory_order_relaxed)) {
-                buffer_[static_cast<size_t>(t % static_cast<uint64_t>(capacity_))].emplace(std::move(value));
-                return true;
+            } else {
+                pos = enqueuePos_.load(std::memory_order_relaxed);
             }
         }
     }
 
     std::optional<T> TryPop()
     {
-        constexpr int max_spin_count = 100;
-        int spin_count = 0;
+        uint64_t pos = dequeuePos_.load(std::memory_order_relaxed);
+        Slot &slot = buffer_[static_cast<size_t>(pos % static_cast<uint64_t>(capacity_))];
+        uint64_t sequence = slot.sequence.load(std::memory_order_acquire);
+        intptr_t diff = static_cast<intptr_t>(sequence) - static_cast<intptr_t>(pos + 1);
 
-        uint64_t h = head_.load(std::memory_order_relaxed);
-        uint64_t t = tail_.load(std::memory_order_acquire);
-
-        if (t == h) {
+        if (diff < 0) {
             return std::nullopt;
         }
 
-        auto &slot = buffer_[static_cast<size_t>(h % static_cast<uint64_t>(capacity_))];
-        while (!slot.has_value()) {
-            if (++spin_count > max_spin_count) {
-                std::this_thread::yield();
-                spin_count = 0;
-                h = head_.load(std::memory_order_relaxed);
-                t = tail_.load(std::memory_order_acquire);
-                if (t == h) {
-                    return std::nullopt;
-                }
-                slot = buffer_[static_cast<size_t>(h % static_cast<uint64_t>(capacity_))];
-            } else {
-                std::this_thread::yield();
-            }
+        if (diff > 0) {
+            return std::nullopt;
         }
 
-        std::optional<T> result(std::move(slot.value()));
-        slot.reset();
-        head_.store(h + 1, std::memory_order_release);
+        std::optional<T> result(std::move(*slot.Data()));
+        slot.Data()->~T();
+        dequeuePos_.store(pos + 1, std::memory_order_release);
+        slot.sequence.store(pos + static_cast<uint64_t>(capacity_), std::memory_order_release);
         return result;
     }
 
     void Clear()
     {
-        uint64_t h = head_.load(std::memory_order_relaxed);
-        uint64_t t = tail_.load(std::memory_order_relaxed);
-        while (h != t) {
-            buffer_[static_cast<size_t>(h % static_cast<uint64_t>(capacity_))].reset();
-            ++h;
+        while (TryPop().has_value()) {
         }
-        head_.store(t, std::memory_order_release);
     }
 
 private:
     size_t capacity_;
-    std::vector<std::optional<T>> buffer_;
-    std::atomic<uint64_t> head_;
-    std::atomic<uint64_t> tail_;
+    std::vector<Slot> buffer_;
+    std::atomic<uint64_t> dequeuePos_;
+    std::atomic<uint64_t> enqueuePos_;
 };
 
 /**
