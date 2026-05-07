@@ -24,14 +24,14 @@ namespace {
 std::string TruncateThreadName(const std::string &name)
 {
 #if defined(__APPLE__)
-    constexpr size_t maxNameLen = 63;
+    constexpr size_t kMaxNameLen = 63;
+    return name.substr(0, kMaxNameLen);
 #elif defined(__linux__)
-    constexpr size_t maxNameLen = 15;
+    constexpr size_t kMaxNameLen = 15;
+    return name.substr(0, kMaxNameLen);
 #else
     return name;
 #endif
-
-    return name.substr(0, maxNameLen);
 }
 
 #if defined(_WIN32)

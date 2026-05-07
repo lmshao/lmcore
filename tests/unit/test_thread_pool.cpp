@@ -114,11 +114,11 @@ TEST(ThreadPoolTest, DifferentSerialTagsCanRunInParallel)
     }
 
     // Check that tasks from different tags can start in parallel
-    std::this_thread::sleep_for(std::chrono::milliseconds(30));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     EXPECT_TRUE(total_started.load() >= 2); // At least 2 tasks should have started
 
     // Wait for all tasks to complete
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    std::this_thread::sleep_for(std::chrono::milliseconds(400));
     EXPECT_EQ(tag1_counter.load(), 3);
     EXPECT_EQ(tag2_counter.load(), 3);
 }

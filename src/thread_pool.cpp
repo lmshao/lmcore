@@ -146,8 +146,8 @@ void ThreadPool::AddTask(const Task &task, const std::string &serialTag)
             }
         }
 
-        // Create threads dynamically
-        if (idle_ == 0 && (int)threads_.size() < threadsMax_) {
+        // Create threads dynamically when queued tasks exceed idle threads
+        if ((int)tasks_.size() > idle_ && (int)threads_.size() < threadsMax_) {
             CreateWorkerThread();
         }
     }

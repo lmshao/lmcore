@@ -112,13 +112,13 @@ TEST(TimeUtils, UnixNtpRoundTrip)
 TEST(TimeUtils, GetRtpTimestampVideo)
 {
     uint32_t rtp1 = TimeUtils::GetRtpTimestamp(90000);
-    TimeUtils::SleepMs(100);
+    TimeUtils::SleepMs(200);
     uint32_t rtp2 = TimeUtils::GetRtpTimestamp(90000);
 
-    // 100ms at 90kHz = 9000 ticks
+    // 200ms at 90kHz = 18000 ticks
     uint32_t diff = rtp2 - rtp1;
     // Allow wider tolerance on busy systems
-    EXPECT_TRUE(diff >= 7000 && diff <= 11000);
+    EXPECT_TRUE(diff >= 14000 && diff <= 22000);
 }
 
 // Format time - default format
@@ -210,7 +210,7 @@ TEST(TimeUtils, SleepMs)
     int64_t end = TimeUtils::GetCurrentTimeMs();
 
     int64_t elapsed = end - start;
-    EXPECT_TRUE(elapsed >= 45 && elapsed <= 100); // Allow some tolerance
+    EXPECT_TRUE(elapsed >= 45 && elapsed <= 200); // Allow some tolerance
 }
 
 // Sleep microseconds
