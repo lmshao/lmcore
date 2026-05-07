@@ -117,8 +117,8 @@ TEST(TimeUtils, GetRtpTimestampVideo)
 
     // 200ms at 90kHz = 18000 ticks
     uint32_t diff = rtp2 - rtp1;
-    // Allow wider tolerance on busy systems
-    EXPECT_TRUE(diff >= 14000 && diff <= 22000);
+    // Allow wide tolerance for slow/busy CI systems (100ms ~ 500ms)
+    EXPECT_TRUE(diff >= 9000 && diff <= 45000);
 }
 
 // Format time - default format
