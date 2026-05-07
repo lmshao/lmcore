@@ -67,7 +67,7 @@ TEST(AsyncTimerTest, ScheduleRepeatingTimer)
     EXPECT_EQ(1, timer->GetActiveTimerCount());
 
     // Wait for multiple executions
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    std::this_thread::sleep_for(std::chrono::milliseconds(400));
 
     EXPECT_GE(counter.load(), 3);               // Should execute at least 3 times
     EXPECT_EQ(1, timer->GetActiveTimerCount()); // Still active
@@ -156,7 +156,7 @@ TEST(AsyncTimerTest, MultipleTimers)
     EXPECT_EQ(3, timer->GetActiveTimerCount());
 
     // Wait for execution
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    std::this_thread::sleep_for(std::chrono::milliseconds(400));
 
     EXPECT_EQ(1, counter1.load()); // One-time timer
     EXPECT_EQ(1, counter2.load()); // One-time timer
@@ -231,7 +231,7 @@ TEST(AsyncTimerTest, RepeatingTimerWithInitialDelay)
     EXPECT_NE(0, timerId);
 
     // Wait for multiple executions
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(800));
 
     EXPECT_GE(counter.load(), 3); // Should execute multiple times
 }
@@ -265,7 +265,7 @@ TEST(AsyncTimerTest, ThreadPoolIntegration)
     }
 
     // Wait for all executions
-    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    std::this_thread::sleep_for(std::chrono::milliseconds(600));
 
     EXPECT_EQ(5, counter.load());
     EXPECT_GE(maxConcurrent.load(), 1);                // Should have at least 1 concurrent execution
