@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
+jobs:
+  build-and-test:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        build_type: [Release, Debug]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure CMake
+        run: >
+          cmake -B build
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DBUILD_TESTS=ON
+          -DBUILD_STATIC_LIBS=ON
+          -DBUILD_SHARED_LIBS=OFF
+
+      - name: Build
+        run: cmake --build build --config ${{ matrix.build_type }} --parallel
+
+      - name: Run Tests
+        working-directory: build
+        run: ctest --build-config ${{ matrix.build_type }} --output-on-failure --parallel 4
